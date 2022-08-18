@@ -31,7 +31,7 @@ then
 fi
 
 # Check if there are changes
-if [[ `git status --porcelain` ]]; then
+if [ `git status --porcelain` ]; then
   echo "Will not setup package if branch has changes" 1>&2
   exit 1
 fi
