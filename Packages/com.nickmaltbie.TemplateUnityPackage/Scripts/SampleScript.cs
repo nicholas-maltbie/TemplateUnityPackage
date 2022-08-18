@@ -37,5 +37,13 @@ namespace com.nickmaltbie.TemplateUnityPackage
         {
             Value++;
         }
+
+        /// <summary>
+        /// Update function run each frame.
+        /// </summary>
+        public void Update()
+        {
+            IncrementValue();
+        }
     }
 }

@@ -16,13 +16,31 @@
 // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-/// <summary>
-/// Constants for the project
-/// </summary>
-public static class Constants
+using com.nickmaltbie.TemplateUnityPackage;
+using NUnit.Framework;
+using UnityEngine;
+
+namespace nickmaltbie.TemplateUnityPackage.Tests.EditMode
 {
     /// <summary>
-    /// Folder application project is stored in.
+    /// Tests meant to be run in EditMode.
     /// </summary>
-    public static string ProjectName = "TemplateUnityPackage";
+    public class EditModeTests
+    {
+        /// <summary>
+        /// Simple sample script test.
+        /// </summary>
+        [Test]
+        public void SimpleSampleScriptTest()
+        {
+            var go = new GameObject();
+            SampleScript sample = go.AddComponent<SampleScript>();
+
+            Assert.AreEqual(sample.Value, 0);
+            sample.IncrementValue();
+            Assert.AreEqual(sample.Value, 1);
+
+            GameObject.DestroyImmediate(go);
+        }
+    }
 }
