@@ -37,7 +37,10 @@ if [[ `git status --porcelain` ]]; then
 fi
 
 # Move to temporary branch
-git branch -D temp-branch
+exists=`git show-ref refs/heads/temp-branch`
+if [ -n "$exists" ]; then
+  git branch -D temp-branch
+fi
 git checkout -b temp-branch
 
 user_email=$(git config --global user.email)
