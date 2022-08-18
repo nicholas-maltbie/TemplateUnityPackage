@@ -86,7 +86,10 @@ git checkout . && git clean -xdf .
 if [ ! -z "$selected_tag" ]
 then
   # Push changes to original repo
-  git branch -D "release/$selected_tag"
+  exists=`git show-ref refs/heads/release/$selected_tag`
+  if [ -n "$exists" ]; then
+    git branch -D "release/$selected_tag"
+  fi
   git branch -m "release/$selected_tag"
   git push --set-upstream origin "release/$selected_tag" --force
 
@@ -94,7 +97,4 @@ then
   # Cleanup any files in the repo we don't care about
   git checkout . && git clean -xdf .
   git checkout "$current_sha" && git checkout "$current_branch"
-else
-  # CLeanup temp branch
-  git branch -D temp-branch
 fi
