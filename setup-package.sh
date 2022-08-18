@@ -94,7 +94,7 @@ then
   # Cleanup any files in the repo we don't care about
   git checkout . && git clean -xdf .
   git checkout "$current_sha" && git checkout "$current_branch"
+else
+  # CLeanup temp branch
+  git branch -D temp-branch
 fi
-
-# CLeanup temp branch
-git branch -D temp-branch
