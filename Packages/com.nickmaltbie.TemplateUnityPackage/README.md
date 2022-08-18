@@ -101,7 +101,6 @@ and is automatically deployed with each update to the codebase.
 ## Samples
 
 The samples in the project include:
-
 * ExampleSample - Example sample for Template unity project.
 
 ## Documentation
