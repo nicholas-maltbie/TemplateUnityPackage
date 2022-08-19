@@ -31,21 +31,6 @@ jobs:
           branch: release/${{ steps.releaseTagName.outputs.tag }}
           force: true
 
-      - name: Get Tag Name from Tag Push
-        if: "${{ steps.releaseTagName.outputs.tag == '' }}"
-        id: pushTagName
-        uses: aaronbarnaby/get-tag@v1.0.0
-        with:
-          without_prefix_v: false
-
-      - name: Get Tag Name from Tag Push
-        if: "${{ steps.releaseTagName.outputs.tag == '' && steps.pushTagName.outputs.tag != '' }}"
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: release/${{ steps.pushTagName.outputs.tag }}
-          force: true
-
       - name: Git lfs Pull
         run: git lfs pull
         shell: bash
