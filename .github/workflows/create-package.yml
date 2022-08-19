@@ -3,6 +3,7 @@ name: Create and Publish npm Package
 on:
   push:
     tags:
+      - '*'
   release:
     types: [published]
 
@@ -31,6 +32,7 @@ jobs:
           force: true
 
       - name: Get Tag Name from Tag Push
+        if: "${{ steps.releaseTagName.outputs.tag == '' }}"
         id: pushTagName
         uses: aaronbarnaby/get-tag@v1.0.0
         with:
