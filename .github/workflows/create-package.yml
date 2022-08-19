@@ -1,6 +1,8 @@
 name: Create and Publish npm Package
 
 on:
+  push:
+    tags:
   release:
     types: [published]
 

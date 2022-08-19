@@ -3,6 +3,8 @@
 Nick Maltbie's Template Unity Package for easily creating and sharing unity
 packages over git and NPM.
 
+![Example importing package from git.](Demo/project-demo.png)
+
 Template Unity Package is an open source project hosted at
 [https://github.com/nicholas-maltbie/TemplateUnityPackage](https://github.com/nicholas-maltbie/TemplateUnityPackage)
 
