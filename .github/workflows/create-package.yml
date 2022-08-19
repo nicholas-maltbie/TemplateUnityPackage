@@ -19,23 +19,29 @@ jobs:
 
       - name: Get tag name
         uses: olegtarasov/get-tag@v2.1.1
-        id: tagName
+        id: releaseTagName
 
       # Deploy build to release branch
       - name: Push package via Release Tag
-        if: "${{ steps.tagName.outputs.tag != '' }}"
+        if: "${{ steps.releaseTagName.outputs.tag != '' }}"
         uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: release/${{ steps.tagName.outputs.tag }}
+          branch: release/${{ steps.releaseTagName.outputs.tag }}
           force: true
 
       - name: Get Tag Name from Tag Push
-        if: "${{ steps.tagName.outputs.tag == '' && github.ref_name != '' }}"
+        id: pushTagName
+        uses: aaronbarnaby/get-tag@v1.0.0
+        with:
+          without_prefix_v: false
+
+      - name: Get Tag Name from Tag Push
+        if: "${{ steps.releaseTagName.outputs.tag == '' && steps.pushTagName.outputs.tag != '' }}"
         uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: release/${{  github.ref_name }}
+          branch: release/${{ steps.pushTagName.outputs.tag }}
           force: true
 
       - name: Git lfs Pull
@@ -51,6 +57,7 @@ jobs:
       
       - name: Publish Package to NpmJS
         run: npm publish
+        continue-on-error: true
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       
