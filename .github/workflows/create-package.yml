@@ -31,7 +31,7 @@ jobs:
           force: true
 
       - name: Get Tag Name from Tag Push
-        if: "${{ steps.tagName.outputs.tag == '' && ${{  github.ref_name }} != '' }}"
+        if: "${{ steps.tagName.outputs.tag == '' && github.ref_name != '' }}"
         uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
