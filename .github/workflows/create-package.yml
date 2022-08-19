@@ -22,12 +22,20 @@ jobs:
         id: tagName
 
       # Deploy build to release branch
-      - name: Push package
+      - name: Push package via Release Tag
         if: "${{ steps.tagName.outputs.tag != '' }}"
         uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: release/${{ steps.tagName.outputs.tag }}
+          force: true
+
+      - name: Get Tag Name from Tag Push
+        if: "${{ steps.tagName.outputs.tag == '' && ${{  github.ref_name }} != '' }}"
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: release/${{  github.ref_name }}
           force: true
 
       - name: Git lfs Pull
