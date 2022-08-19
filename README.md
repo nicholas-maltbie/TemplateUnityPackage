@@ -20,7 +20,7 @@ from th auto-generated branch for that release. An example of importing `v1.0.0`
 would look like this:
 
 ```text
-https://github.com/nicholas-maltbie/TemplateUnityPackage.git#release/v0.1.0
+https://github.com/nicholas-maltbie/TemplateUnityPackage.git#release/v1.0.0
 ```
 
 To use the latest release, simply reference:
