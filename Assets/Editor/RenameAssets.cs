@@ -62,6 +62,8 @@ public class RenameAssetsWindow : EditorWindow
 
     private const string sourceCompanyName = "nickmaltbie";
     private const string sourceProjectName = "Template Unity Package";
+    private const string sourceWebsiteName = "https://nickmaltbie.com";
+    private const string sourceGitHubUsername = "nicholas-maltbie";
 
     private bool regenerateGUIDs = true;
 
@@ -81,6 +83,22 @@ public class RenameAssetsWindow : EditorWindow
         apply = true,
     };
 
+    private ReplaceStringObject websiteNameReplace = new ReplaceStringObject
+    {
+        name = "Website",
+        source = sourceWebsiteName,
+        dest = sourceWebsiteName,
+        apply = true,
+    };
+
+    private ReplaceStringObject gitHubUsernameReplace = new ReplaceStringObject
+    {
+        name = "GitHub Username",
+        source = sourceGitHubUsername,
+        dest = sourceGitHubUsername,
+        apply = true,
+    };
+
 
     [MenuItem("Tools/Rename Template Assets")]
     public static void ShowMyEditor()
@@ -94,6 +112,8 @@ public class RenameAssetsWindow : EditorWindow
     {
         PromptField(ref companyNameReplace);
         PromptField(ref projectNameReplace);
+        PromptField(ref websiteNameReplace);
+        PromptField(ref gitHubUsernameReplace);
         regenerateGUIDs = EditorGUILayout.Toggle($"Regenerate Asset GUIDs: ", regenerateGUIDs);
 
         if (GUILayout.Button("Rename Assets"))
@@ -134,7 +154,12 @@ public class RenameAssetsWindow : EditorWindow
         (string, string)[] companyNameTransforms = GetTransformed(projectNameReplace.source, projectNameReplace.dest.Trim(), transformFunctions).ToArray();
         (string, string)[] projectNameTransforms = GetTransformed(companyNameReplace.source, companyNameReplace.dest.Trim(), transformFunctions).ToArray();
         (string, string)[] renameTargets = companyNameTransforms.Union(projectNameTransforms).ToArray();
-        (string, string)[] replaceTargets = renameTargets;
+        (string, string)[] replaceTargets = GetTransformed(gitHubUsernameReplace.source, gitHubUsernameReplace.dest.Trim(), transformFunctions)
+            .Union(GetTransformed(websiteNameReplace.source, websiteNameReplace.dest.Trim(), transformFunctions))
+            .Union(GetTransformed(companyNameReplace.source, companyNameReplace.dest.Trim(), transformFunctions))
+            .Union(GetTransformed(projectNameReplace.source, projectNameReplace.dest.Trim(), transformFunctions))
+            .Distinct()
+            .ToArray();
 
         // Rename package path
         string packagePath = Directory.EnumerateDirectories(PackagesPath).First(path =>
