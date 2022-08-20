@@ -69,7 +69,7 @@ public class RenameAssetsWindow : EditorWindow
     public void OnGUI()
     {
         PromptField("Project", sourceProjectName, ref destProjectName);
-        PromptField("Compoany", sourceCompanyName, ref destCompanyName);
+        PromptField("Company", sourceCompanyName, ref destCompanyName);
 
         if (GUILayout.Button("Rename Assets"))
         {
@@ -107,6 +107,9 @@ public class RenameAssetsWindow : EditorWindow
         destCompanyName = destCompanyName.Trim();
         destProjectName = destProjectName.Trim();
 
+        // Reserialize all assets before updating and moving them.
+        AssetDatabase.ForceReserializeAssets();
+
         var renameTargets = new (string, string)[]
         {
             (sourceCompanyName, destCompanyName),
@@ -121,14 +124,31 @@ public class RenameAssetsWindow : EditorWindow
         string targetPath = packagePath;
         foreach ((string source, string dest) in renameTargets)
         {
-            targetPath = GetRenamedLeaf(targetPath, source, dest, transformFunctions);
+            targetPath = Path.GetRelativePath(ProjectPath, GetRenamedLeaf(targetPath, source, dest, transformFunctions));
         }
 
         Debug.Log(packagePath + " to " + targetPath);
         Directory.Move(packagePath, targetPath);
 
-        AssetDatabase.ImportPackage(packagePath, interactive: false);
-        AssetDatabase.Refresh();
+        AssetDatabase.ImportAsset(
+            targetPath,
+            ImportAssetOptions.ForceSynchronousImport | ImportAssetOptions.ImportRecursive | ImportAssetOptions.ForceUpdate);
+
+        foreach (string path in Directory.EnumerateFiles(targetPath, "*", SearchOption.AllDirectories))
+        {
+            string relativePath = Path.GetRelativePath(ProjectPath, path);
+            targetPath = relativePath;
+
+            foreach ((string source, string dest) in renameTargets)
+            {
+                targetPath = Path.GetRelativePath(ProjectPath, GetRenamedLeaf(targetPath, source, dest, transformFunctions));
+            }
+
+            if (!Equals(relativePath, targetPath))
+            {
+                AssetDatabase.MoveAsset(relativePath, targetPath);
+            }
+        }
 
         Close();
     }
