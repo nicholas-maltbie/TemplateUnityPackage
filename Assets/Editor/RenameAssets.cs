@@ -26,8 +26,8 @@ using UnityEngine;
 /// </summary>
 public class RenameAssetsWindow : EditorWindow
 {
-    private string sourceCompanyName = "nickmaltbie";
-    private string sourceProjectName = "Template Unity Package";
+    private const string sourceCompanyName = "nickmaltbie";
+    private const string sourceProjectName = "Template Unity Package";
 
     private string destCompanyName = "nickmaltbie";
     private string destProjectName = "Template Unity Package";
@@ -40,19 +40,24 @@ public class RenameAssetsWindow : EditorWindow
         wnd.titleContent = new GUIContent("Rename Template Assets");
     }
 
-
     public void OnGUI()
     {
-        sourceProjectName = EditorGUILayout.TextField($"Source Project Name:", sourceProjectName);
-        sourceCompanyName = EditorGUILayout.TextField($"Source Company Name:", sourceCompanyName);
+        PromptField("Project", sourceProjectName, ref destProjectName);
+        PromptField("Compoany", sourceCompanyName, ref destCompanyName);
 
-        destProjectName = EditorGUILayout.TextField($"Rename Project to:", destProjectName);
-        destCompanyName = EditorGUILayout.TextField($"Rename Company to:", destCompanyName);
-
-        if (GUILayout.Button("Rename Assets")) {
+        if (GUILayout.Button("Rename Assets"))
+        {
             OnClickRenameAssets();
             GUIUtility.ExitGUI();
         }
+    }
+    
+    public void PromptField(string name, string source, ref string dest)
+    {
+        EditorGUILayout.LabelField($"Current {name} Name: {source}");
+        dest = EditorGUILayout.TextField($"Rename {name} to", dest);
+
+        EditorGUILayout.Space();
     }
 
     public static string NoSpaces(string str) => str.Replace(" ", "");
@@ -69,8 +74,6 @@ public class RenameAssetsWindow : EditorWindow
     };
 
     public void OnClickRenameAssets() {
-        sourceCompanyName = sourceCompanyName.Trim();
-        sourceProjectName = sourceProjectName.Trim();
         destCompanyName = destCompanyName.Trim();
         destProjectName = destProjectName.Trim();
 
