@@ -46,6 +46,17 @@ public class RenameAssetsWindow : EditorWindow
         "Builds",
     };
 
+    private readonly IEnumerable<string> includeDirections = new string[]
+    {
+        ".config",
+        ".github",
+        ".vscode",
+        "Assets",
+        "Demo",
+        "Documentation",
+        "Packages"
+    };
+
     private readonly IEnumerable<string> includeSuffixFilter = new string[]
     {
         ".asmdef",
@@ -211,24 +222,26 @@ public class RenameAssetsWindow : EditorWindow
 
             // Replace contents of files that contain company name or project name
             EditorUtility.DisplayProgressBar($"Replacing Strings, Step 3/4", "...", 0);
-            int totalFiles = Directory.EnumerateFiles(ProjectPath, "*", SearchOption.AllDirectories).Count();
+            IEnumerable<string> allFilesInProject =
+                Directory.EnumerateFiles(ProjectPath, "*", SearchOption.TopDirectoryOnly)
+                .Union(includeDirections.SelectMany(dir =>
+                    Directory.EnumerateFiles(Path.Join(ProjectPath, dir), "*", SearchOption.AllDirectories)));
+            int totalFiles = allFilesInProject.Count();
             progress = 0;
-            foreach (string path in Directory.EnumerateFiles(ProjectPath, "*", SearchOption.AllDirectories))
+            foreach (string path in allFilesInProject)
             {
                 progress++;
-                EditorUtility.DisplayProgressBar(
-                    $"Replacing Strings, Step 3/4",
-                    $"Checking File {Path.GetRelativePath(ProjectPath, path)}",
-                    (float)progress / totalFiles);
-
                 string relPath = Path.GetRelativePath(ProjectPath, path);
                 string fileName = Path.GetFileName(path);
-                if (ignorePrefixFilter.Any(ignore => relPath.StartsWith(ignore)))
-                {
-                    continue;
-                }
+                bool skip = ignorePrefixFilter.Any(ignore => relPath.StartsWith(ignore)) ||
+                    !includeSuffixFilter.Any(end => fileName.EndsWith(end));
+                string op = skip ? "Skipping" : "Checking";
+                EditorUtility.DisplayProgressBar(
+                    $"Replacing Strings, Step 3/4",
+                    $"{op} File {Path.GetRelativePath(ProjectPath, path)}",
+                    (float)progress / totalFiles);
 
-                if (!includeSuffixFilter.Any(end => fileName.EndsWith(end)))
+                if (skip)
                 {
                     continue;
                 }
