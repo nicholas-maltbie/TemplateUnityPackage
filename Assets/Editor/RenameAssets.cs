@@ -24,6 +24,14 @@ using Jads.Tools;
 using UnityEditor;
 using UnityEngine;
 
+public struct ReplaceStringObject
+{
+    public string name;
+    public string source;
+    public string dest;
+    public bool apply;
+}
+
 /// <summary>
 /// Window to select how to rename assets.
 /// </summary>
@@ -56,8 +64,23 @@ public class RenameAssetsWindow : EditorWindow
     private const string sourceProjectName = "Template Unity Package";
 
     private bool regenerateGUIDs = true;
-    private string destCompanyName = sourceCompanyName;
-    private string destProjectName = sourceProjectName;
+
+    private ReplaceStringObject companyNameReplace = new ReplaceStringObject
+    {
+        name = "Company",
+        source = sourceCompanyName,
+        dest = sourceCompanyName,
+        apply = true,
+    };
+
+    private ReplaceStringObject projectNameReplace = new ReplaceStringObject
+    {
+        name = "Project",
+        source = sourceProjectName,
+        dest = sourceProjectName,
+        apply = true,
+    };
+
 
     [MenuItem("Tools/Rename Template Assets")]
     public static void ShowMyEditor()
@@ -69,8 +92,8 @@ public class RenameAssetsWindow : EditorWindow
 
     public void OnGUI()
     {
-        PromptField("Project", sourceProjectName, ref destProjectName);
-        PromptField("Company", sourceCompanyName, ref destCompanyName);
+        PromptField(companyNameReplace);
+        PromptField(projectNameReplace);
         regenerateGUIDs = EditorGUILayout.Toggle($"Regenerate Asset GUIDs: ", regenerateGUIDs);
 
         if (GUILayout.Button("Rename Assets"))
@@ -80,10 +103,11 @@ public class RenameAssetsWindow : EditorWindow
         }
     }
 
-    public void PromptField(string name, string source, ref string dest)
+    public void PromptField(ReplaceStringObject obj)
     {
-        EditorGUILayout.LabelField($"Current {name} Name: {source}");
-        dest = EditorGUILayout.TextField($"Rename {name} to", dest);
+        EditorGUILayout.LabelField($"Current {obj.name} Name: {obj.source}");
+        obj.dest = EditorGUILayout.TextField($"Rename {obj.name} to", obj.dest);
+        obj.apply = EditorGUILayout.Toggle($"Replace text in files", obj.apply);
 
         EditorGUILayout.Space();
     }
