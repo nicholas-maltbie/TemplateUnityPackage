@@ -52,12 +52,12 @@ public class RenameAssetsWindow : EditorWindow
         ".yml",
     };
 
-    private const string sourceCompanyName = "companyname";
+    private const string sourceCompanyName = "nickmaltbie";
     private const string sourceProjectName = "Template Unity Package";
 
     private bool regenerateGUIDs = true;
-    private string destCompanyName = "companyname";
-    private string destProjectName = "Template Unity Package";
+    private string destCompanyName = sourceCompanyName;
+    private string destProjectName = sourceProjectName;
 
     [MenuItem("Tools/Rename Template Assets")]
     public static void ShowMyEditor()
