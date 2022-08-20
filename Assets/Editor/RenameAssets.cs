@@ -92,8 +92,8 @@ public class RenameAssetsWindow : EditorWindow
 
     public void OnGUI()
     {
-        PromptField(companyNameReplace);
-        PromptField(projectNameReplace);
+        PromptField(ref companyNameReplace);
+        PromptField(ref projectNameReplace);
         regenerateGUIDs = EditorGUILayout.Toggle($"Regenerate Asset GUIDs: ", regenerateGUIDs);
 
         if (GUILayout.Button("Rename Assets"))
@@ -103,7 +103,7 @@ public class RenameAssetsWindow : EditorWindow
         }
     }
 
-    public void PromptField(ReplaceStringObject obj)
+    public void PromptField(ref ReplaceStringObject obj)
     {
         EditorGUILayout.LabelField($"Current {obj.name} Name: {obj.source}");
         obj.dest = EditorGUILayout.TextField($"Rename {obj.name} to", obj.dest);
