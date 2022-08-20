@@ -101,7 +101,7 @@ public class RenameAssetsWindow : EditorWindow
 
     public static string ProjectPath => Directory.GetParent(Application.dataPath).FullName;
 
-    public static string PackagesPath => ProjectPath + "Packages";
+    public static string PackagesPath => Path.Combine(ProjectPath, "Packages");
 
     public void OnClickRenameAssets() {
         destCompanyName = destCompanyName.Trim();
@@ -115,27 +115,39 @@ public class RenameAssetsWindow : EditorWindow
 
         // Rename package path
         string packagePath = Directory.EnumerateDirectories(PackagesPath).First(path =>
-            path.ContainsInvariantCultureIgnoreCase(sourceCompanyName) &&
-            path.ContainsInvariantCultureIgnoreCase(sourceProjectName));
+            MatchesTransform(path, sourceCompanyName, transformFunctions) &&
+            MatchesTransform(path, sourceProjectName, transformFunctions));
 
+        string targetPath = packagePath;
         foreach ((string source, string dest) in renameTargets)
         {
-            Directory.Move(packagePath, GetRenamedLeaf(packagePath, source, dest, transformFunctions));
+            targetPath = GetRenamedLeaf(targetPath, source, dest, transformFunctions);
         }
 
+        Debug.Log(packagePath + " to " + targetPath);
+        Directory.Move(packagePath, targetPath);
+
+        AssetDatabase.ImportPackage(packagePath, interactive: false);
+        AssetDatabase.Refresh();
+
         Close();
+    }
+
+    public bool MatchesTransform(string filePath, string source, IEnumerable<Func<string, string>> transforms)
+    {
+        return transforms.FirstOrDefault(f => f(filePath).Contains(f(source))) != null;
     }
 
     public string GetRenamedLeaf(string filePath, string source, string dest, IEnumerable<Func<string, string>> transforms)
     {
         return Path.Combine(
-            Directory.GetParent(Application.dataPath).FullName,
+            Directory.GetParent(filePath).FullName,
             GetRenamedPath(Path.GetFileName(filePath), source, dest, transforms));
     }
 
     public string GetRenamedPath(string filePath, string source, string dest, IEnumerable<Func<string, string>> transforms)
     {
-        Func<string, string> f = transforms.FirstOrDefault(f => filePath.Contains(dest));
-        return f == null ? filePath : filePath.Replace(f(source), f(dest));
+        Func<string, string> f = transforms.FirstOrDefault(f => f(filePath).Contains(f(source)));
+        return f == null ? filePath : f(filePath).Replace(f(source), f(dest));
     }
 }
