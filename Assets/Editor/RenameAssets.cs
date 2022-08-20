@@ -20,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -28,9 +29,21 @@ using UnityEngine;
 /// </summary>
 public class RenameAssetsWindow : EditorWindow
 {
-    private readonly IEnumerable<string> fileEndints = new string[]
+    private readonly IEnumerable<string> ignoreFilter = new string[]
     {
+        ".git",
+    };
 
+    private readonly IEnumerable<string> fileEndings = new string[]
+    {
+        ".asmdef",
+        ".cs",
+        ".csproj",
+        ".env",
+        ".json",
+        ".md",
+        ".sh",
+        ".yml",
     };
 
     private const string sourceCompanyName = "nickmaltbie";
@@ -111,8 +124,13 @@ public class RenameAssetsWindow : EditorWindow
 
     public void RenameAssets(string source, string dest, bool ignoreCase = false)
     {
-        foreach (string filePath in Directory.EnumerateFiles(Path.Combine(ScriptBatch.AssetDirectory)))
+        foreach (string filePath in Directory.EnumerateFiles(Application.dataPath))
         {
+            if (ignoreFilter.Any(ignore => filePath.StartsWith(ignore)))
+            {
+                continue;
+            }
+
             string newName = ignoreCase ? 
                 filePath.Replace(source, dest, StringComparison.OrdinalIgnoreCase) :
                 filePath.Replace(source, dest);
