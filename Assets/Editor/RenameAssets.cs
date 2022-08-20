@@ -131,11 +131,13 @@ public class RenameAssetsWindow : EditorWindow
                 continue;
             }
 
-            string newName = ignoreCase ? 
-                filePath.Replace(source, dest, StringComparison.OrdinalIgnoreCase) :
-                filePath.Replace(source, dest);
+            string relativePath = filePath.Remove(0, Application.dataPath.Length);
 
-            if (filePath != newName)
+            string newName = ignoreCase ?
+                relativePath.Replace(source, dest, StringComparison.OrdinalIgnoreCase) :
+                relativePath.Replace(source, dest);
+
+            if (relativePath != newName)
             {
                 AssetDatabase.RenameAsset(filePath, filePath);
             }
