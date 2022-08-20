@@ -124,22 +124,30 @@ public class RenameAssetsWindow : EditorWindow
 
     public void RenameAssets(string source, string dest, bool ignoreCase = false)
     {
-        foreach (string filePath in Directory.EnumerateFiles(Application.dataPath))
+        RenameAssets(Directory.EnumerateDirectories(Application.dataPath), source, dest, ignoreCase);
+
+    }
+
+    public void RenameAssets(IEnumerable<string> paths, string source, string dest, bool ignoreCase = false)
+    {
+        foreach (string filePath in paths)
         {
             if (ignoreFilter.Any(ignore => filePath.StartsWith(ignore)))
             {
                 continue;
             }
 
-            string relativePath = filePath.Remove(0, Application.dataPath.Length);
+            string relativePath = "." + filePath.Remove(0, Application.dataPath.Length);
 
             string newName = ignoreCase ?
                 relativePath.Replace(source, dest, StringComparison.OrdinalIgnoreCase) :
                 relativePath.Replace(source, dest);
 
+            UnityEngine.Debug.Log($"{relativePath}, {newName}");
+
             if (relativePath != newName)
             {
-                AssetDatabase.RenameAsset(filePath, filePath);
+                Debug.Log(AssetDatabase.RenameAsset(filePath, filePath));
             }
         }
     }
