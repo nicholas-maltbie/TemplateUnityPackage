@@ -133,7 +133,10 @@ public class RenameAssetsWindow : EditorWindow
         {
             string relativePath = Path.GetRelativePath(ProjectPath, path);
             string targetPath = ApplyRenameTargets(relativePath, renameTargets);
-            AssetDatabase.MoveAsset(relativePath, targetPath);
+            if (relativePath != targetPath)
+            {
+                AssetDatabase.MoveAsset(relativePath, targetPath);
+            }
         }
 
         // Replace contents of files that contain company name or project name
@@ -191,7 +194,7 @@ public class RenameAssetsWindow : EditorWindow
     {
         string targetPath = ApplyRenameTargets(packagePath, renameTargets);
 
-        if (packagePath == targetPath)
+        if (Path.GetRelativePath(ProjectPath, packagePath) == Path.GetRelativePath(ProjectPath, targetPath))
         {
             return targetPath;
         }
@@ -219,6 +222,6 @@ public class RenameAssetsWindow : EditorWindow
             text = text.Replace(source, dest);
         }
 
-        File.WriteAllText(filePath, text, System.Text.Encoding.UTF8);
+        File.WriteAllText(filePath, text);
     }
 }
