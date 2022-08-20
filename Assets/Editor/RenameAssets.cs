@@ -72,7 +72,6 @@ public class RenameAssetsWindow : EditorWindow
         PromptField("Company", sourceCompanyName, ref destCompanyName);
         regenerateGUIDs = EditorGUILayout.Toggle($"Regenerate Asset GUIDs: ", regenerateGUIDs);
 
-
         if (GUILayout.Button("Rename Assets"))
         {
             OnClickRenameAssets();
@@ -110,9 +109,9 @@ public class RenameAssetsWindow : EditorWindow
         destCompanyName = destCompanyName.Trim();
         destProjectName = destProjectName.Trim();
 
-        var companyNameTransforms = GetTransformed(sourceCompanyName, destCompanyName, transformFunctions).ToArray();
-        var projectNameTransforms = GetTransformed(sourceCompanyName, destCompanyName, transformFunctions).ToArray();
-        var renameTargets = companyNameTransforms.Union(projectNameTransforms).ToArray();
+        (string, string)[] companyNameTransforms = GetTransformed(sourceCompanyName, destCompanyName, transformFunctions).ToArray();
+        (string, string)[] projectNameTransforms = GetTransformed(sourceCompanyName, destCompanyName, transformFunctions).ToArray();
+        (string, string)[] renameTargets = companyNameTransforms.Union(projectNameTransforms).ToArray();
 
         // Rename package path
         string packagePath = Directory.EnumerateDirectories(PackagesPath).First(path =>
@@ -122,7 +121,7 @@ public class RenameAssetsWindow : EditorWindow
         // regenerate guids for project files
         if (regenerateGUIDs)
         {
-            RegenerateGUIDS(new []
+            RegenerateGUIDS(new[]
                 {
                     Path.GetRelativePath(ProjectPath, packagePath),
                     Path.GetRelativePath(ProjectPath, Application.dataPath)
@@ -136,7 +135,7 @@ public class RenameAssetsWindow : EditorWindow
             string targetPath = ApplyRenameTargets(relativePath, renameTargets);
             AssetDatabase.MoveAsset(relativePath, targetPath);
         }
-        
+
         // Replace contents of files that contain company name or project name
         foreach (string path in Directory.EnumerateFiles(ProjectPath, "*", SearchOption.AllDirectories))
         {
@@ -184,6 +183,7 @@ public class RenameAssetsWindow : EditorWindow
         {
             targetPath = Path.GetRelativePath(ProjectPath, GetRenamedLeaf(targetPath, source, dest));
         }
+
         return targetPath;
     }
 
@@ -218,6 +218,7 @@ public class RenameAssetsWindow : EditorWindow
         {
             text = text.Replace(source, dest);
         }
+
         File.WriteAllText(filePath, text);
     }
 }
