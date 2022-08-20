@@ -131,12 +131,10 @@ public class RenameAssetsWindow : EditorWindow
 
     public void OnClickRenameAssets()
     {
-        destCompanyName = destCompanyName.Trim();
-        destProjectName = destProjectName.Trim();
-
-        (string, string)[] companyNameTransforms = GetTransformed(sourceCompanyName, destCompanyName, transformFunctions).ToArray();
-        (string, string)[] projectNameTransforms = GetTransformed(sourceCompanyName, destCompanyName, transformFunctions).ToArray();
+        (string, string)[] companyNameTransforms = GetTransformed(projectNameReplace.source, projectNameReplace.dest.Trim(), transformFunctions).ToArray();
+        (string, string)[] projectNameTransforms = GetTransformed(companyNameReplace.source, companyNameReplace.dest.Trim(), transformFunctions).ToArray();
         (string, string)[] renameTargets = companyNameTransforms.Union(projectNameTransforms).ToArray();
+        (string, string)[] replaceTargets = renameTargets;
 
         // Rename package path
         string packagePath = Directory.EnumerateDirectories(PackagesPath).First(path =>
@@ -179,7 +177,7 @@ public class RenameAssetsWindow : EditorWindow
                 continue;
             }
 
-            ReplaceTextInFiles(path, renameTargets);
+            ReplaceTextInFiles(path, replaceTargets);
         }
 
         // Move package
