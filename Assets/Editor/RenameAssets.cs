@@ -18,9 +18,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
+using Jads.Tools;
 using UnityEditor;
 using UnityEngine;
 
@@ -32,12 +32,6 @@ public class RenameAssetsWindow : EditorWindow
     private readonly IEnumerable<string> ignoreFilter = new string[]
     {
         ".git",
-    };
-
-    private readonly IEnumerable<string> assetFolders = new string[]
-    {
-        "Assets",
-        "Packages"
     };
 
     private readonly IEnumerable<string> fileEndings = new string[]
@@ -77,7 +71,7 @@ public class RenameAssetsWindow : EditorWindow
             GUIUtility.ExitGUI();
         }
     }
-    
+
     public void PromptField(string name, string source, ref string dest)
     {
         EditorGUILayout.LabelField($"Current {name} Name: {source}");
@@ -103,12 +97,10 @@ public class RenameAssetsWindow : EditorWindow
 
     public static string PackagesPath => Path.Combine(ProjectPath, "Packages");
 
-    public void OnClickRenameAssets() {
+    public void OnClickRenameAssets()
+    {
         destCompanyName = destCompanyName.Trim();
         destProjectName = destProjectName.Trim();
-
-        // Reserialize all assets before updating and moving them.
-        AssetDatabase.ForceReserializeAssets();
 
         var renameTargets = new (string, string)[]
         {
@@ -120,6 +112,18 @@ public class RenameAssetsWindow : EditorWindow
         string packagePath = Directory.EnumerateDirectories(PackagesPath).First(path =>
             MatchesTransform(path, sourceCompanyName, transformFunctions) &&
             MatchesTransform(path, sourceProjectName, transformFunctions));
+
+        // Regenerate GUIDs for project folders
+        IEnumerable<string> fileGUIDs = Directory.EnumerateFileSystemEntries(packagePath, "*", SearchOption.AllDirectories)
+            .Union(Directory.EnumerateFileSystemEntries(Application.dataPath, "*", SearchOption.AllDirectories)
+            .Select(path => Path.GetRelativePath(ProjectPath, path)))
+            .Select(path => AssetDatabase.GUIDFromAssetPath(path).ToString());
+
+        AssetDatabase.StartAssetEditing();
+        AssetGUIDRegenerator.RegenerateGUIDs(fileGUIDs.ToArray(), false);
+        AssetDatabase.StopAssetEditing();
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
 
         string targetPath = packagePath;
         foreach ((string source, string dest) in renameTargets)
@@ -150,6 +154,8 @@ public class RenameAssetsWindow : EditorWindow
             }
         }
 
+        AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate | ImportAssetOptions.ImportRecursive | ImportAssetOptions.ForceSynchronousImport);
+        AssetDatabase.ForceReserializeAssets();
         Close();
     }
 
