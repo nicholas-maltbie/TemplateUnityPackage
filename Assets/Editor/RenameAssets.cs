@@ -124,7 +124,7 @@ public class RenameAssetsWindow : EditorWindow
 
     public void RenameAssets(string source, string dest, bool ignoreCase = false)
     {
-        RenameAssets(Directory.EnumerateDirectories(Application.dataPath), source, dest, ignoreCase);
+        RenameAssets(Directory.EnumerateDirectories(Application.dataPath, "*", SearchOption.AllDirectories), source, dest, ignoreCase);
 
     }
 
