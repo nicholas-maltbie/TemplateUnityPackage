@@ -29,18 +29,23 @@ using UnityEngine;
 /// </summary>
 public class RenameAssetsWindow : EditorWindow
 {
-    private readonly IEnumerable<string> ignoreFilter = new string[]
+    private readonly IEnumerable<string> ignorePrefixFilter = new string[]
     {
         ".git",
+        ".vs",
+        "Logs",
+        "UserSettings",
+        "Builds",
     };
 
-    private readonly IEnumerable<string> fileEndings = new string[]
+    private readonly IEnumerable<string> includeSuffixFilter = new string[]
     {
         ".asmdef",
         ".cs",
         ".csproj",
         ".env",
         ".json",
+        ".txt",
         ".md",
         ".sh",
         ".yml",
@@ -49,6 +54,7 @@ public class RenameAssetsWindow : EditorWindow
     private const string sourceCompanyName = "nickmaltbie";
     private const string sourceProjectName = "Template Unity Package";
 
+    private bool regenerateGUIDs = true;
     private string destCompanyName = "nickmaltbie";
     private string destProjectName = "Template Unity Package";
 
@@ -64,6 +70,8 @@ public class RenameAssetsWindow : EditorWindow
     {
         PromptField("Project", sourceProjectName, ref destProjectName);
         PromptField("Company", sourceCompanyName, ref destCompanyName);
+        regenerateGUIDs = EditorGUILayout.Toggle($"Regenerate Asset GUIDs: ", regenerateGUIDs);
+
 
         if (GUILayout.Button("Rename Assets"))
         {
@@ -102,78 +110,114 @@ public class RenameAssetsWindow : EditorWindow
         destCompanyName = destCompanyName.Trim();
         destProjectName = destProjectName.Trim();
 
-        var renameTargets = new (string, string)[]
-        {
-            (sourceCompanyName, destCompanyName),
-            (sourceProjectName, destProjectName),
-        };
+        var companyNameTransforms = GetTransformed(sourceCompanyName, destCompanyName, transformFunctions).ToArray();
+        var projectNameTransforms = GetTransformed(sourceCompanyName, destCompanyName, transformFunctions).ToArray();
+        var renameTargets = companyNameTransforms.Union(projectNameTransforms).ToArray();
 
         // Rename package path
         string packagePath = Directory.EnumerateDirectories(PackagesPath).First(path =>
-            MatchesTransform(path, sourceCompanyName, transformFunctions) &&
-            MatchesTransform(path, sourceProjectName, transformFunctions));
+            companyNameTransforms.Any(pair => path.Contains(pair.Item1)) &&
+            projectNameTransforms.Any(pair => path.Contains(pair.Item1)));
 
+        // regenerate guids for project files
+        if (regenerateGUIDs)
+        {
+            RegenerateGUIDS(new []
+                {
+                    Path.GetRelativePath(ProjectPath, packagePath),
+                    Path.GetRelativePath(ProjectPath, Application.dataPath)
+                });
+        }
+
+        // Rename files that have project or company name in file name
+        foreach (string path in Directory.EnumerateFiles(packagePath, "*", SearchOption.AllDirectories))
+        {
+            string relativePath = Path.GetRelativePath(ProjectPath, path);
+            string targetPath = ApplyRenameTargets(relativePath, renameTargets);
+            AssetDatabase.MoveAsset(relativePath, targetPath);
+        }
+        
+        // Replace contents of files that contain company name or project name
+        foreach (string path in Directory.EnumerateFiles(ProjectPath, "*", SearchOption.AllDirectories))
+        {
+            string relPath = Path.GetRelativePath(ProjectPath, path);
+            string fileName = Path.GetFileName(path);
+            if (ignorePrefixFilter.Any(ignore => relPath.StartsWith(ignore)))
+            {
+                continue;
+            }
+
+            if (!includeSuffixFilter.Any(end => fileName.EndsWith(end)))
+            {
+                continue;
+            }
+
+            ReplaceTextInFiles(path, renameTargets);
+        }
+
+        // Move package
+        packagePath = MovePackageFolder(packagePath, renameTargets);
+        Close();
+    }
+
+    public static IEnumerable<(string, string)> GetTransformed(string source, string dest, IEnumerable<Func<string, string>> fns)
+    {
+        return fns.Select(fn => (fn(source), fn(dest))).Distinct();
+    }
+
+    public static void RegenerateGUIDS(string[] paths)
+    {
         // Regenerate GUIDs for project folders
-        IEnumerable<string> fileGUIDs = Directory.EnumerateFileSystemEntries(packagePath, "*", SearchOption.AllDirectories)
-            .Union(Directory.EnumerateFileSystemEntries(Application.dataPath, "*", SearchOption.AllDirectories)
-            .Select(path => Path.GetRelativePath(ProjectPath, path)))
-            .Select(path => AssetDatabase.GUIDFromAssetPath(path).ToString());
+        IEnumerable<string> fileGUIDs = AssetDatabase.FindAssets("*", paths);
 
         AssetDatabase.StartAssetEditing();
         AssetGUIDRegenerator.RegenerateGUIDs(fileGUIDs.ToArray(), false);
         AssetDatabase.StopAssetEditing();
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
+    }
 
-        string targetPath = packagePath;
+    public static string ApplyRenameTargets(string filePath, IEnumerable<(string, string)> renameTargets)
+    {
+        string targetPath = filePath;
         foreach ((string source, string dest) in renameTargets)
         {
-            targetPath = Path.GetRelativePath(ProjectPath, GetRenamedLeaf(targetPath, source, dest, transformFunctions));
+            targetPath = Path.GetRelativePath(ProjectPath, GetRenamedLeaf(targetPath, source, dest));
+        }
+        return targetPath;
+    }
+
+    public static string MovePackageFolder(string packagePath, IEnumerable<(string, string)> renameTargets)
+    {
+        string targetPath = ApplyRenameTargets(packagePath, renameTargets);
+
+        if (packagePath == targetPath)
+        {
+            return targetPath;
         }
 
-        Debug.Log(packagePath + " to " + targetPath);
         Directory.Move(packagePath, targetPath);
 
-        AssetDatabase.ImportAsset(
-            targetPath,
-            ImportAssetOptions.ForceSynchronousImport | ImportAssetOptions.ImportRecursive | ImportAssetOptions.ForceUpdate);
+        AssetDatabase.ImportAsset(targetPath, ImportAssetOptions.ForceSynchronousImport | ImportAssetOptions.ImportRecursive | ImportAssetOptions.ForceUpdate);
+        AssetDatabase.Refresh();
 
-        foreach (string path in Directory.EnumerateFiles(targetPath, "*", SearchOption.AllDirectories))
-        {
-            string relativePath = Path.GetRelativePath(ProjectPath, path);
-            targetPath = relativePath;
-
-            foreach ((string source, string dest) in renameTargets)
-            {
-                targetPath = Path.GetRelativePath(ProjectPath, GetRenamedLeaf(targetPath, source, dest, transformFunctions));
-            }
-
-            if (!Equals(relativePath, targetPath))
-            {
-                AssetDatabase.MoveAsset(relativePath, targetPath);
-            }
-        }
-
-        AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate | ImportAssetOptions.ImportRecursive | ImportAssetOptions.ForceSynchronousImport);
-        AssetDatabase.ForceReserializeAssets();
-        Close();
+        return targetPath;
     }
 
-    public bool MatchesTransform(string filePath, string source, IEnumerable<Func<string, string>> transforms)
-    {
-        return transforms.FirstOrDefault(f => f(filePath).Contains(f(source))) != null;
-    }
-
-    public string GetRenamedLeaf(string filePath, string source, string dest, IEnumerable<Func<string, string>> transforms)
+    public static string GetRenamedLeaf(string filePath, string source, string dest)
     {
         return Path.Combine(
             Directory.GetParent(filePath).FullName,
-            GetRenamedPath(Path.GetFileName(filePath), source, dest, transforms));
+            Path.GetFileName(filePath).Replace(source, dest));
     }
 
-    public string GetRenamedPath(string filePath, string source, string dest, IEnumerable<Func<string, string>> transforms)
+    public static void ReplaceTextInFiles(string filePath, IEnumerable<(string, string)> replaceTargets)
     {
-        Func<string, string> f = transforms.FirstOrDefault(f => f(filePath).Contains(f(source)));
-        return f == null ? filePath : f(filePath).Replace(f(source), f(dest));
+        string text = File.ReadAllText(filePath);
+        foreach ((string source, string dest) in replaceTargets)
+        {
+            text = text.Replace(source, dest);
+        }
+        File.WriteAllText(filePath, text);
     }
 }
