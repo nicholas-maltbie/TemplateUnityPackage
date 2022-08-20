@@ -114,7 +114,7 @@ public class RenameAssetsWindow : EditorWindow
         foreach (string filePath in Directory.EnumerateFiles(Path.Combine(ScriptBatch.AssetDirectory)))
         {
             string newName = ignoreCase ? 
-                filePath.Replace(source, dest, StringComparison.InvariantCultureIgnoreCase) :
+                filePath.Replace(source, dest, StringComparison.OrdinalIgnoreCase) :
                 filePath.Replace(source, dest);
 
             if (filePath != newName)
