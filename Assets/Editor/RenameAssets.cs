@@ -162,52 +162,89 @@ public class RenameAssetsWindow : EditorWindow
             .ToArray();
 
         // Rename package path
-        string packagePath = Directory.EnumerateDirectories(PackagesPath).First(path =>
+        string packagePath = Directory.EnumerateDirectories(PackagesPath).FirstOrDefault(path =>
             companyNameTransforms.Any(pair => path.Contains(pair.Item1)) &&
             projectNameTransforms.Any(pair => path.Contains(pair.Item1)));
 
-        // regenerate guids for project files
-        if (regenerateGUIDs)
+        if (packagePath == default)
         {
-            RegenerateGUIDS(new[]
+            EditorUtility.DisplayDialog(
+                "Failed to Find Package",
+                $"Could not find package folder in {ProjectPath} for\n" +
+                $"Company Name: {sourceCompanyName}\nProject Name: {sourceProjectName}",
+                "Ok");
+            Close();
+            return;
+        }
+
+        try
+        {
+            // regenerate guids for project files
+            if (regenerateGUIDs)
+            {
+                EditorUtility.DisplayProgressBar($"Regenerating Guids", "Regenerating Guids, Step 1/4", 0);
+                RegenerateGUIDS(new[]
+                    {
+                        Path.GetRelativePath(ProjectPath, packagePath),
+                        Path.GetRelativePath(ProjectPath, Application.dataPath)
+                    });
+            }
+
+            // Rename files that have project or company name in file name
+            EditorUtility.DisplayProgressBar($"Renaming Files, Step 2/4", "...", 0);
+            string[] filePaths = Directory.EnumerateFiles(packagePath, "*", SearchOption.AllDirectories).ToArray();
+            int progress = 0;
+            foreach (string path in filePaths)
+            {
+                progress++;
+                EditorUtility.DisplayProgressBar(
+                    $"Renaming Files, Step 2/4",
+                    $"Checking File {Path.GetRelativePath(ProjectPath, path)}",
+                    (float)progress / filePaths.Length);
+                string relativePath = Path.GetRelativePath(ProjectPath, path);
+                string targetPath = ApplyRenameTargets(relativePath, renameTargets);
+                if (relativePath != targetPath)
                 {
-                    Path.GetRelativePath(ProjectPath, packagePath),
-                    Path.GetRelativePath(ProjectPath, Application.dataPath)
-                });
-        }
+                    AssetDatabase.MoveAsset(relativePath, targetPath);
+                }
+            }
 
-        // Rename files that have project or company name in file name
-        foreach (string path in Directory.EnumerateFiles(packagePath, "*", SearchOption.AllDirectories))
+            // Replace contents of files that contain company name or project name
+            EditorUtility.DisplayProgressBar($"Replacing Strings, Step 3/4", "...", 0);
+            int totalFiles = Directory.EnumerateFiles(ProjectPath, "*", SearchOption.AllDirectories).Count();
+            progress = 0;
+            foreach (string path in Directory.EnumerateFiles(ProjectPath, "*", SearchOption.AllDirectories))
+            {
+                progress++;
+                EditorUtility.DisplayProgressBar(
+                    $"Replacing Strings, Step 3/4",
+                    $"Checking File {Path.GetRelativePath(ProjectPath, path)}",
+                    (float)progress / totalFiles);
+
+                string relPath = Path.GetRelativePath(ProjectPath, path);
+                string fileName = Path.GetFileName(path);
+                if (ignorePrefixFilter.Any(ignore => relPath.StartsWith(ignore)))
+                {
+                    continue;
+                }
+
+                if (!includeSuffixFilter.Any(end => fileName.EndsWith(end)))
+                {
+                    continue;
+                }
+
+                ReplaceTextInFiles(path, replaceTargets);
+            }
+
+            // Move package
+            EditorUtility.DisplayProgressBar($"Moving Package Folder", $"{packagePath} to {renameTargets}", 1);
+            packagePath = MovePackageFolder(packagePath, renameTargets);
+        }
+        finally
         {
-            string relativePath = Path.GetRelativePath(ProjectPath, path);
-            string targetPath = ApplyRenameTargets(relativePath, renameTargets);
-            if (relativePath != targetPath)
-            {
-                AssetDatabase.MoveAsset(relativePath, targetPath);
-            }
+            EditorUtility.ClearProgressBar();
+            Close();
         }
-
-        // Replace contents of files that contain company name or project name
-        foreach (string path in Directory.EnumerateFiles(ProjectPath, "*", SearchOption.AllDirectories))
-        {
-            string relPath = Path.GetRelativePath(ProjectPath, path);
-            string fileName = Path.GetFileName(path);
-            if (ignorePrefixFilter.Any(ignore => relPath.StartsWith(ignore)))
-            {
-                continue;
-            }
-
-            if (!includeSuffixFilter.Any(end => fileName.EndsWith(end)))
-            {
-                continue;
-            }
-
-            ReplaceTextInFiles(path, replaceTargets);
-        }
-
-        // Move package
-        packagePath = MovePackageFolder(packagePath, renameTargets);
-        Close();
     }
 
     public static IEnumerable<(string, string)> GetTransformed(string source, string dest, IEnumerable<Func<string, string>> fns)
