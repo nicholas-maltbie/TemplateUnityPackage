@@ -1,4 +1,4 @@
-﻿#pragma warning disable IDE0073 // The file header does not match the required text
+#pragma warning disable IDE0073 // The file header does not match the required text
 
 /*
 
