@@ -31,7 +31,7 @@ public class RenameAssetsWindow : EditorWindow
 {
     private readonly IEnumerable<string> ignorePrefixFilter = new string[]
     {
-        ".git",
+        ".git" + Path.DirectorySeparatorChar,
         ".vs",
         "Logs",
         "UserSettings",
@@ -41,6 +41,7 @@ public class RenameAssetsWindow : EditorWindow
     private readonly IEnumerable<string> includeSuffixFilter = new string[]
     {
         ".asmdef",
+        ".cmd",
         ".cs",
         ".csproj",
         ".env",
@@ -51,11 +52,11 @@ public class RenameAssetsWindow : EditorWindow
         ".yml",
     };
 
-    private const string sourceCompanyName = "nickmaltbie";
+    private const string sourceCompanyName = "companyname";
     private const string sourceProjectName = "Template Unity Package";
 
     private bool regenerateGUIDs = true;
-    private string destCompanyName = "nickmaltbie";
+    private string destCompanyName = "companyname";
     private string destProjectName = "Template Unity Package";
 
     [MenuItem("Tools/Rename Template Assets")]
