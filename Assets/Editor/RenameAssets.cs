@@ -34,6 +34,12 @@ public class RenameAssetsWindow : EditorWindow
         ".git",
     };
 
+    private readonly IEnumerable<string> assetFolders = new string[]
+    {
+        "Assets",
+        "Packages"
+    };
+
     private readonly IEnumerable<string> fileEndings = new string[]
     {
         ".asmdef",
@@ -124,7 +130,14 @@ public class RenameAssetsWindow : EditorWindow
 
     public void RenameAssets(string source, string dest, bool ignoreCase = false)
     {
-        RenameAssets(Directory.EnumerateDirectories(Application.dataPath, "*", SearchOption.AllDirectories), source, dest, ignoreCase);
+        foreach (string assetFolder in assetFolders)
+        {
+            string projectPath = Path.Combine(Directory.GetParent(Application.dataPath).FullName;
+            RenameAssets(Directory.EnumerateFileSystemEntries(
+                Path.Combine(projectPath, assetFolder),
+                "*",
+                SearchOption.AllDirectories), source, dest, ignoreCase);
+        }
 
     }
 
@@ -137,17 +150,23 @@ public class RenameAssetsWindow : EditorWindow
                 continue;
             }
 
-            string relativePath = "." + filePath.Remove(0, Application.dataPath.Length);
+            string relativePath = filePath.StartsWith(Directory.GetParent(Application.dataPath).FullName) ?
+                filePath.Remove(0, Directory.GetParent(Application.dataPath).FullName.Length + 1) : filePath;
 
             string newName = ignoreCase ?
                 relativePath.Replace(source, dest, StringComparison.OrdinalIgnoreCase) :
                 relativePath.Replace(source, dest);
 
-            UnityEngine.Debug.Log($"{relativePath}, {newName}");
-
-            if (relativePath != newName)
+            if (!relativePath.Equals(newName, StringComparison.OrdinalIgnoreCase))
             {
-                Debug.Log(AssetDatabase.RenameAsset(filePath, filePath));
+                DirectoryInfo parent = Directory.GetParent(newName);
+                if (!parent.Exists)
+                {
+                    Directory.CreateDirectory(parent.FullName);
+                }
+
+                UnityEngine.Debug.Log($"{relativePath}, {newName}");
+                Debug.Log(AssetDatabase.MoveAsset(relativePath, newName));
             }
         }
     }
