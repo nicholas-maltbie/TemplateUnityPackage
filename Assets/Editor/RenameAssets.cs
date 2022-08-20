@@ -99,6 +99,10 @@ public class RenameAssetsWindow : EditorWindow
         LowerNoSpaces
     };
 
+    public static string ProjectPath => Directory.GetParent(Application.dataPath).FullName;
+
+    public static string PackagesPath => ProjectPath + "Packages";
+
     public void OnClickRenameAssets() {
         destCompanyName = destCompanyName.Trim();
         destProjectName = destProjectName.Trim();
@@ -109,65 +113,29 @@ public class RenameAssetsWindow : EditorWindow
             (sourceProjectName, destProjectName),
         };
 
-        foreach ((string source, string dest) in renameTargets)
-        {
-            foreach(Func<string, string> fn in transformFunctions)
-            {
-                RenameAssets(fn(source), fn(dest));
-            }
-        }
+        // Rename package path
+        string packagePath = Directory.EnumerateDirectories(PackagesPath).First(path =>
+            path.ContainsInvariantCultureIgnoreCase(sourceCompanyName) &&
+            path.ContainsInvariantCultureIgnoreCase(sourceProjectName));
 
         foreach ((string source, string dest) in renameTargets)
         {
-            foreach(Func<string, string> fn in transformFunctions)
-            {
-                RenameAssets(fn(source), fn(dest), true);
-            }
+            Directory.Move(packagePath, GetRenamedLeaf(packagePath, source, dest, transformFunctions));
         }
 
         Close();
     }
 
-    public void RenameAssets(string source, string dest, bool ignoreCase = false)
+    public string GetRenamedLeaf(string filePath, string source, string dest, IEnumerable<Func<string, string>> transforms)
     {
-        foreach (string assetFolder in assetFolders)
-        {
-            string projectPath = Path.Combine(Directory.GetParent(Application.dataPath).FullName;
-            RenameAssets(Directory.EnumerateFileSystemEntries(
-                Path.Combine(projectPath, assetFolder),
-                "*",
-                SearchOption.AllDirectories), source, dest, ignoreCase);
-        }
-
+        return Path.Combine(
+            Directory.GetParent(Application.dataPath).FullName,
+            GetRenamedPath(Path.GetFileName(filePath), source, dest, transforms));
     }
 
-    public void RenameAssets(IEnumerable<string> paths, string source, string dest, bool ignoreCase = false)
+    public string GetRenamedPath(string filePath, string source, string dest, IEnumerable<Func<string, string>> transforms)
     {
-        foreach (string filePath in paths)
-        {
-            if (ignoreFilter.Any(ignore => filePath.StartsWith(ignore)))
-            {
-                continue;
-            }
-
-            string relativePath = filePath.StartsWith(Directory.GetParent(Application.dataPath).FullName) ?
-                filePath.Remove(0, Directory.GetParent(Application.dataPath).FullName.Length + 1) : filePath;
-
-            string newName = ignoreCase ?
-                relativePath.Replace(source, dest, StringComparison.OrdinalIgnoreCase) :
-                relativePath.Replace(source, dest);
-
-            if (!relativePath.Equals(newName, StringComparison.OrdinalIgnoreCase))
-            {
-                DirectoryInfo parent = Directory.GetParent(newName);
-                if (!parent.Exists)
-                {
-                    Directory.CreateDirectory(parent.FullName);
-                }
-
-                UnityEngine.Debug.Log($"{relativePath}, {newName}");
-                Debug.Log(AssetDatabase.MoveAsset(relativePath, newName));
-            }
-        }
+        Func<string, string> f = transforms.FirstOrDefault(f => filePath.Contains(dest));
+        return f == null ? filePath : filePath.Replace(f(source), f(dest));
     }
 }
