@@ -31,9 +31,12 @@ for more details on how to use the project.
 1. Automated GitHub actions including:
     * Verifying project build on WebGL platform.
     * Building unity package and pushing it to a GitHub branch and NPM repo.
-    * Deploying the WebGL build to `gh-pages` branch and uploading to GitHub pages.
-    * Building documentation from markdown files with `docfx` and uploading to GitHub pages.
-    * Verification of code/documentation formatting via `dotnet format` and `markdown-lint`.
+    * Deploying the WebGL build to `gh-pages` branch and uploading
+      to GitHub pages.
+    * Building documentation from markdown files with `docfx` and
+      uploading to GitHub pages.
+    * Verification of code/documentation formatting via `dotnet format`
+      and `markdown-lint`.
     * Test validation for unity tests.
 
 ## Documentation
