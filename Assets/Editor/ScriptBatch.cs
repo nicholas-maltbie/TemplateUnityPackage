@@ -1,3 +1,5 @@
+#pragma warning disable IDE0073 // The file header does not match the required text
+
 // Copyright (C) 2022 Nicholas Maltbie
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and

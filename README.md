@@ -5,10 +5,42 @@ packages over git and NPM.
 
 ![Example importing package from git.](Demo/project-demo.png)
 
+If you want to host and share code between unity projects easily,
+use this project to configure unity builds.
+
 Template Unity Package is an open source project hosted at
 [https://github.com/nicholas-maltbie/TemplateUnityPackage](https://github.com/nicholas-maltbie/TemplateUnityPackage)
 
 This is an open source project licensed under a [MIT License](LICENSE.txt).
+
+## Template Components
+
+Parts of template project, please see the documentation at
+[https://nickmaltbie.com/TemplateUnityPackage/docs/](https://nickmaltbie.com/TemplateUnityPackage/docs/)
+for more details on how to use the project.
+
+1. Automated script to rename all scripts in project.
+1. Template setup for a unity package.
+    * Example package with example script.
+    * Automated testing validation in PlayMode and EditMode.
+    * Template `package.json` configuration.
+1. Script to build package release to git branch.
+1. Git/GitHub configuration for project
+    * `.gitattributes` for unity projects using `git-lfs`
+    * `.gitignore` for unity projects
+1. Automated GitHub actions including:
+    * Verifying project build on WebGL platform.
+    * Building unity package and pushing it to a GitHub branch and NPM repo.
+    * Deploying the WebGL build to `gh-pages` branch and uploading to GitHub pages.
+    * Building documentation from markdown files with `docfx` and uploading to GitHub pages.
+    * Verification of code/documentation formatting via `dotnet format` and `markdown-lint`.
+    * Test validation for unity tests.
+
+## Documentation
+
+Documentation on the project and scripting API is found at
+[https://nickmaltbie.com/TemplateUnityPackage/docs/](https://nickmaltbie.com/TemplateUnityPackage/docs/)
+for the latest version of the codebase.
 
 ## Installation
 
@@ -105,9 +137,3 @@ and is automatically deployed with each update to the codebase.
 The samples in the project include:
 
 * ExampleSample - Example sample for Template Unity Package.
-
-## Documentation
-
-Documentation on the project and scripting API is found at
-[https://nickmaltbie.com/TemplateUnityPackage/docs/](https://nickmaltbie.com/TemplateUnityPackage/docs/)
-for the latest version of the codebase.
