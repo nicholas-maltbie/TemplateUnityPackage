@@ -112,7 +112,6 @@ public class RenameAssetsWindow : EditorWindow
         apply = true,
     };
 
-
     [MenuItem("Tools/Rename Template Assets")]
     public static void ShowMyEditor()
     {
