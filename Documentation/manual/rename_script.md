@@ -9,3 +9,5 @@ the GUIDs for unity assets to avoid asset collisions in the
 future.
 
 ## Example Usage
+
+<!-- TODO: Document example usage and flags -->

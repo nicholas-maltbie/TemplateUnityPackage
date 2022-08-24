@@ -40,8 +40,7 @@ name, etc...) as well as regenerate the project asset GUIDs
 for unity to avoid asset collisions in multiple uses of
 the template.
 
-See the [Rename Script](rename_script.md) for details on how
-to use the rename script in the project.
+See the [Rename Script](rename_script.md) page for further details.
 
 ### Script to Create Package
 
@@ -64,6 +63,8 @@ Arguments:
       package. If provided, will create a new branch with
       the name pattern `release/$tag`
 
+See the [Package Setup](package_setup.md) page for further details.
+
 ### Automated GitHub actions
 
 There are many automated github actions in
@@ -71,11 +72,11 @@ the project stored at `.github/actions`
 
 | Workflow | Description |
 |----------|-------------|
-| `build-verification.yml` | Verify that project can build for a specific platform (default WebGL) properly. |
-| `create-package.yml` | Creates a package and attempts to push it to a github branch and npmjs repo. |
+| `build-verification.yml` | `Verify that project can properly. |
+| `create-package.yml` | Creates a package for a github branch and npmjs repo. |
 | `deploy.yml` | Builds and deploys project to the `gh-pages` branch. |
-| `format.yml` | Verifies formatting for project with `markdownlint`, `dotnet format`, and `docfx` |
-| `tests-validation.yml` | Runs test validation on the project in EditMode and PlayMode |
+| `format.yml` | Linting with `markdownlint`, `dotnet format`, and `docfx`. |
+| `tests-validation.yml` | Runs test validation on the project. |
 
 Please look at the workflow files for further details and
 documentation on the github repo.
@@ -86,8 +87,11 @@ in the file `.github/variables/projectconfig.env`.
 And there are a few shared workflow scripts under `.github/actions` folder
 including:
 
-| Action | Description |
-|--------|-------------|
-| `git-lfs-cache` | Loads files from `git-lfs` using a cache from the list of lfs files. |
-| `setvars` | Loads variables from the `projectconfig.env` file. |
-| `unity-library-cache` | Caches the unity library folders as part of github build. |
+* `git-lfs-cache` -
+    Loads files from `git-lfs` using a cache from the list of lfs files.
+* `setvars` -
+    Loads variables from the `projectconfig.env` file.
+* `unity-library-cache` -
+    Caches the unity library folders as part of github build.
+
+See the [GitHub Actions](github_actions.md) page for further details.
