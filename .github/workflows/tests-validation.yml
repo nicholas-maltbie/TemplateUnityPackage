@@ -30,7 +30,7 @@ jobs:
           unityVersion: ${{ env.UNITY_VERSION }}
           testMode: All
           checkName: All Test Results
-          customParameters: "-burst-disable-compilation -nographics"
+          customParameters: "-assemblyNames:com.nickmaltbie.TemplateUnityPackage"
 
       - name: Copy Coverage Results
         run: |
