@@ -30,6 +30,7 @@ Features of this template package include:
 * Rename Script for Unity Assets
 * Script to Create Package
 * Automated GitHub Actions
+* Documentation Website Template with DocFx
 
 ### Rename Script
 
@@ -95,3 +96,12 @@ including:
     Caches the unity library folders as part of github build.
 
 See the [GitHub Actions](github_actions.md) page for further details.
+
+### Documentation Template Website
+
+In addition, this package includes a documentation website template
+that you can customize for your package. This website is part
+of the documentation template using docfx. This includes scripts
+to create the documentation website with docfx tool that includes
+API documentation. See the
+[Documentation Website](documentation_website.md) page for further details.
