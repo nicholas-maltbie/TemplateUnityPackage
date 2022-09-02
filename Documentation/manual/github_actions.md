@@ -1,3 +1,3 @@
-# GitHub Actions
+# Template GitHub Actions
 
 <!-- TODO: Write GitHub actions summary. -->
