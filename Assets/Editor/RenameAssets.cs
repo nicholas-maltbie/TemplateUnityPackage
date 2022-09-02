@@ -46,6 +46,7 @@ public class RenameAssetsWindow : EditorWindow
         "Logs",
         "UserSettings",
         "Builds",
+        Path.Join("Documentation", "manual"),
     };
 
     private readonly IEnumerable<string> includeDirections = new string[]
@@ -113,7 +114,7 @@ public class RenameAssetsWindow : EditorWindow
     };
 
     [MenuItem("Tools/Rename Template Assets")]
-    public static void ShowMyEditor()
+    public static void ShowRenameAssets()
     {
         // This method is called when the user selects the menu item in the Editor
         EditorWindow wnd = GetWindow<RenameAssetsWindow>();

@@ -1,3 +1,21 @@
+# Usage: 
+#   setup-package.sh $package_path [$tag]
+#
+# Creates a package of the unity files at the `$package_path` folder
+# and will include the files form "./Assets/Samples" in the export
+# under the path "Samples~" to follow unity convention.
+#
+# Will also preserve any git-lfs links for files to avoid
+# duplicating assets in the repo.
+#
+# Arguments:
+#
+#   $package_path - Required, path to package folder of project,
+#       Should be something like "Packages/com.companyname.packagename"
+#   [$tag] - Optional, tag version to checkout before building
+#       package. If provided, will create a new branch with
+#       the name pattern "release/$tag"
+
 current_branch=$(git rev-parse --abbrev-ref HEAD)
 current_sha=$(git rev-parse --verify HEAD)
 previous_githooks=$(git config core.hooksPath)
