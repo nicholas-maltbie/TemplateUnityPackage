@@ -45,24 +45,9 @@ See the [Rename Script](rename_script.md) page for further details.
 
 ### Script to Create Package
 
-```bash
-setup-package.sh $package_path [$tag]
-```
-
-Creates a package of the unity files at the `$package_path` folder
-and will include the files form `./Assets/Samples` in the export
-under the path `Samples~` to follow unity convention.
-
-Will also preserve any `git-lfs` links for files to avoid
-duplicating assets in the repo.
-
-Arguments:
-
-* `$package_path` - Required, path to package folder of project,
-      Should be something like `Packages/com.companyname.packagename`
-* `[$tag]` - Optional, tag version to checkout before building
-      package. If provided, will create a new branch with
-      the name pattern `release/$tag`
+The project contains a script, `setup-package.sh`, to automate generating a
+package either from the current commit or from a tag of the project. This will
+then be saved to a new git branch preserving `git-lfs` file hashes.
 
 See the [Package Setup](package_setup.md) page for further details.
 
