@@ -13,7 +13,7 @@ following contents:
 
 This website can be generated using `Documentation\build.cmd` or
 `Documentation/build.sh`. This script will first generate the metadata from
-the XML comments in the code, then genreate the website
+the XML comments in the code, then generate the website
 from the configuration provided at `Documentation\docfx.json`.
 
 You can configure this website however fits best for your project. If you
