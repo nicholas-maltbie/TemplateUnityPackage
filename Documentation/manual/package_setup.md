@@ -133,7 +133,7 @@ manager will be able to download it from the registry at
 }
 ```
 
-### Importing Tests
+## Importing Tests
 
 If you wish to include the testing code for this project, make sure to add
 the `com.nickmaltbie.TemplateUnityPackage` to the testables

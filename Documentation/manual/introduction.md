@@ -59,7 +59,7 @@ the project stored at `.github/actions`
 
 | Workflow | Description |
 |----------|-------------|
-| `build-verification.yml` | `Verify that project can properly. |
+| `build-verification.yml` | Verify that project can properly. |
 | `create-package.yml` | Creates a package for a github branch and npmjs repo. |
 | `deploy.yml` | Builds and deploys project to the `gh-pages` branch. |
 | `format.yml` | Linting with `markdownlint`, `dotnet format`, and `docfx`. |
