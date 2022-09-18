@@ -57,5 +57,5 @@
 *.lxo filter=lfs diff=lfs merge=lfs -text
 
 # Some files to ignore
-Demo/project-demo.png                       !filter !diff !merge text
-Documentation/resources/RenamePanel.png     !filter !diff !merge text
+Demo/project-demo.png                       filter= diff= merge= text
+Documentation/resources/RenamePanel.png     filter= diff= merge= text
