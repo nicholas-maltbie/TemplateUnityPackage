@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## In Progress
 
+* Fixed image for title.
+* Refactoring of existing namespaces.
 * Updated unity version to 2021.3.11f1.
 
 ## [1.0.0] - 2022-09-02

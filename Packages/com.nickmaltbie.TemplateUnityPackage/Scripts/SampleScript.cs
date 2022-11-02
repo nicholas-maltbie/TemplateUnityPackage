@@ -18,7 +18,7 @@
 
 using UnityEngine;
 
-namespace com.nickmaltbie.TemplateUnityPackage
+namespace nickmaltbie.TemplateUnityPackage
 {
     /// <summary>
     /// Basic sample script in project.
