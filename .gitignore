@@ -107,7 +107,3 @@ Documentation/index.*
 Documentation/LICENSE.txt
 Documentation/obj/
 Packages/**/obj*
-
-# Ignore the demo images
-Demo/project-demo.png
-Documentation/resources/RenamePanel.png
