@@ -3,7 +3,7 @@
 Nick Maltbie's Template Unity Package for easily creating and sharing unity
 packages over git and NPM.
 
-![Example importing package from git.](Demo/project-demo.png)
+![Example importing package from git.](Demo/project_demo.png)
 
 If you want to host and share code between unity projects easily,
 use this project to configure unity builds.
