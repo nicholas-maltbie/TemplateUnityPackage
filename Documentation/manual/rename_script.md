@@ -23,7 +23,7 @@ The panel currently supports four rename patterns:
 ![
     View of rename panel in
     unity and various options.
-](../resources/RenamePanel.png)
+](../resources/rename_panel.png)
 
 In the rename panel, each of the options has three
 main attributes:

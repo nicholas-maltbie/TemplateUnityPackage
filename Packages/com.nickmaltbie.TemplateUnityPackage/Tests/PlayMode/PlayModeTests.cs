@@ -17,7 +17,7 @@
 // SOFTWARE.
 
 using System.Collections;
-using com.nickmaltbie.TemplateUnityPackage;
+using nickmaltbie.TemplateUnityPackage;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
