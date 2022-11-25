@@ -17,23 +17,27 @@ for a given version of the package's source code.
 Example Usage:
 
 ```bash
-setup-package.sh $package_path [$tag]
+setup-package.sh -p $package_path [-t $tag] [-s $sample1,$sample2,...]
 ```
 
 Creates a package of the unity files at the `$package_path` folder
-and will include the files form `./Assets/Samples` in the export
-under the path `Samples~` to follow unity convention.
+and will include the files form "./Assets/Samples" in the export
+under the path "Samples~" to follow unity convention.
 
-Will also preserve any `git-lfs` links for files to avoid
+Will also preserve any git-lfs links for files to avoid
 duplicating assets in the repo.
 
 Arguments:
 
-* `$package_path` - Required, path to package folder of project,
-      Should be something like `Packages/com.companyname.packagename`
-* `[$tag]` - Optional, tag version to checkout before building
-      package. If provided, will create a new branch with
-      the name pattern `release/$tag`
+* `-p $package_path` - Required, path to package folder of project,
+  Should be something like "Packages/com.companyname.packagename"
+* `[-t $tag]` - Optional, tag version to checkout before building
+  package. If provided, will create a new branch with
+  the name pattern "release/$tag"
+* `[-s $sample1,$sample2,...]` - Optional, comma separated list
+  of samples to copy from the "./Assets/Samples" folder. If none
+  is provided, then will select all the samples found in the Samples
+  folder (if any).
 
 ## Samples
 
