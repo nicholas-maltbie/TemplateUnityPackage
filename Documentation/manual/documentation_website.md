@@ -21,6 +21,6 @@ want to make a sharable package, I suggest including documentation
 on how the samples work and how to use the APIs included in the package.
 
 The github action `deploy.yml` will also create a build of the
-website and upload it to the `gh-pages` branch of your project.
-If you configure the github repo to upload the `gh-pages` branch
-to a static website, then you can host the website as part of the repo.
+website and upload it to the build via the
+[actions/deploy-pages](https://github.com/marketplace/actions/deploy-github-pages-site)
+if you have the environment configured properly.
