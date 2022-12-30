@@ -148,7 +148,7 @@ jobs:
         uses: joutvhu/delete-artifact@v1
         with:
           name: |
-            temp_build_webgl_build
+            temp_build_webgl
             temp_build_docs
             github-pages
 
