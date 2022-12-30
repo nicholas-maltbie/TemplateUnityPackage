@@ -5,7 +5,7 @@ include the following workflows:
 
 * `build-verification.yml` - Verify that project can properly.
 * `create-package.yml` - Creates a package for a github branch and npmjs repo.
-* `deploy.yml` - Builds and deploys project to the `gh-pages` branch.
+* `deploy.yml` - Builds and deploys project to the pages environment.
 * `format.yml` - Linting with `markdownlint`, `dotnet format`, and `docfx`.
 * `tests-validation.yml` - Runs test validation on the project.
 
@@ -65,9 +65,12 @@ the main branch of the repo. This action does three main things when launched
 1. Create a new release at the branch `release/latest` based on the most recent
     code update for the repo.
 1. Build the project using [game-ci/unity-builder](https://github.com/marketplace/actions/unity-builder)
-    for WebGl and push this build to the `gh-pages` branch of the repo.
+    for WebGl and push this build to the github pages
+    environment using [actions/deploy-pages](https://github.com/marketplace/actions/deploy-github-pages-site).
 1. Build the documentation for the website using `docfx` and push this
-    documentation to the `gh-pages` branch along with the unity WebGL build.
+    documentation to the github pages environment using
+    [actions/deploy-pages](https://github.com/marketplace/actions/deploy-github-pages-site).
+    along with the unity WebGL build.
     For further information on the documentation website, see the
     [Documentation Website](documentation_website.md) page.
 

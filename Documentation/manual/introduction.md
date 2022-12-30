@@ -61,7 +61,7 @@ the project stored at `.github/actions`
 |----------|-------------|
 | `build-verification.yml` | Verify that project can properly. |
 | `create-package.yml` | Creates a package for a github branch and npmjs repo. |
-| `deploy.yml` | Builds and deploys project to the `gh-pages` branch. |
+| `deploy.yml` | Builds and deploys project to the github pages environment. |
 | `format.yml` | Linting with `markdownlint`, `dotnet format`, and `docfx`. |
 | `tests-validation.yml` | Runs test validation on the project. |
 
