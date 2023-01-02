@@ -16,6 +16,8 @@ jobs:
       - uses: ./.github/actions/git-lfs-cache
       - uses: ./.github/actions/setvars
 
+      # Note, if this command fails, ensure that the script is executable
+      # git update-index --chmod=-x ./setup-package.sh
       - name: Setup Package
         run: ./setup-package.sh -p ${{ env.PACKAGE_PATH }}
 
