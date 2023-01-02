@@ -72,8 +72,10 @@ jobs:
         run: |
           echo ::set-output name=LINE_COVERAGE::$(cut -d "=" -f2- <<< ${{ steps.LineCoverage.outputs.result }})
       
+      # Add comment if part of a PR
       - name: Add PR Comment
         uses: mshick/add-pr-comment@v1
+        if: ${{ github.event_name == 'pull_request' }}
         with:
           message: |
             Test Coverage Results for ${{ matrix.testMode }}:
